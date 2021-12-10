@@ -83,7 +83,6 @@ storeApp.displayItems = (inventory, currency) => {
   });
 }
 
-
 storeApp.init = function () {
   const buttons = document.querySelectorAll('button');
   buttons.forEach((button) => {
