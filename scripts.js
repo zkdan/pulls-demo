@@ -106,6 +106,23 @@ $(function () {
 
   // STEP FOUR: add an event listener that will notice when a user clicks on a currency button, find out which currency they have selected, and call our display items method again 
 
+  $('button').on('click', function () {
+    // the ids on our buttons match properties on our currencies object *on purpose* 
+    const currency = $(this).attr('id');
+
+    // we don't want to keep adding to our list here, we want to remove the existing markup 
+    //and replace it with new stuff
+    $('.inventory').html('');
+    displayItems(currentStock, currencies[currency]);
+
+    // update the nav to show the current currency
+    // input the path to the flag image in the img src
+    $('#flag').attr({
+      src: currencies[currency].flag,
+      alt: currencies[currency].displayName
+    });
+    $('#currency').text(currencies[currency].displayName);
+  })
 
 
 
