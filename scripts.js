@@ -1,6 +1,6 @@
+const storeApp = {};
 
-// this is the store data. normally we would be grabbing data from elsewhere (an external api), but this will represent the data model! 
-const totalInventory = [
+storeApp.totalInventory = [
   {
     title: 'Bowie Tee',
     url: 'images/bowie.jpg',
@@ -44,86 +44,62 @@ const totalInventory = [
   },
 ]
 
-// document ready function allows page to load before running any of our scripts 
-$(function () {
-
-  // this object allows us to organize some information that we want to display conditionally depending on what currency the user selects
-
-  const currencies = {
-    usd: {
-      exchange: 1,
-      symbol: `$`,
-      displayName: `USD`,
-      flag: `images/USD-flag.png`
-    },
-    cad: {
-      exchange: 1.28,
-      symbol: `$`,
-      displayName: `CAD`,
-      flag: `images/CAD-flag.png`
-    },
-    gbp: {
-      exchange: 0.76,
-      symbol: `£`,
-      displayName: `GBP`,
-      flag: `images/GBP-flag.png`
-    }
+storeApp.currencies = {
+  usd: {
+    exchange: 1,
+    symbol: `$`,
+    displayName: `USD`,
+    flag: `images/USD-flag.png`
+  },
+  cad: {
+    exchange: 1.28,
+    symbol: `$`,
+    displayName: `CAD`,
+    flag: `images/CAD-flag.png`
+  },
+  gbp: {
+    exchange: 0.76,
+    symbol: `£`,
+    displayName: `GBP`,
+    flag: `images/GBP-flag.png`
   }
+}
 
-  // STEP ONE: filter the inventory so that only items with images that are also in stock are displayed
-
-  const currentStock = totalInventory.filter((item) => {
-    return item.url && item.stock;
-  });
-
-
-
-  // STEP TWO: write a function that displays inventory on the page in the correct pricing
-  // What kind of information (paramaters) does this funciton need to display all of our information?  
-
-  const displayItems = (inventory, currency) => {
-
-
-    inventory.forEach((item) => {
-
-      // the below syntax *creates* an html element as opposed to targeting one 
-      const listItem = $('<li>');
-      const title = $('<h2>').text(item.title);
-      const image = $('<img>').attr('src', item.url);
-      const price = $('<p>').text((item.price * currency.exchange).toFixed(2));
-
-      // this grabs our empty <li> and appends the elements inside
-      listItem.append(title, image, price);
-
-      //this targets the existing .inventory <ul> and puts our new list item inside of it. 
-      $('.inventory').append(listItem);
-    });
-  }
-
-  // STEP THREE: display items on the page passing in USD as defualt
-  displayItems(currentStock, currencies.usd);
-
-
-  // STEP FOUR: add an event listener that will notice when a user clicks on a currency button, find out which currency they have selected, and call our display items method again 
-
-  $('button').on('click', function () {
-    // the ids on our buttons match properties on our currencies object *on purpose* 
-    const currency = $(this).attr('id');
-
-    // we don't want to keep adding to our list here, we want to remove the existing markup 
-    //and replace it with new stuff
-    $('.inventory').html('');
-    displayItems(currentStock, currencies[currency]);
-
-    // update the nav to show the current currency
-    // input the path to the flag image in the img src
-    $('#flag').attr({
-      src: currencies[currency].flag,
-      alt: currencies[currency].displayName
-    });
-    $('#currency').text(currencies[currency].displayName);
-  })
-
-
-
+storeApp.currentStock = storeApp.totalInventory.filter((item) => {
+  return item.url && item.stock;
 });
+
+storeApp.displayItems = (inventory, currency) => {
+  inventory.forEach((item) => {
+    const newLi = document.createElement('li');
+    const html = 
+      `<h2>${item.title} </h2>
+        <img src=${item.url}>
+        <p>${(item.price * currency.exchange).toFixed(2)}</p>`;
+
+    newLi.innerHTML = html;
+
+    document.querySelector('.inventory').append(newLi);
+  });
+}
+
+
+storeApp.init = function () {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach((button) => {
+    button.addEventListener('click', function () {
+      const currency = this.id;
+      document.querySelector('.inventory').innerHTML = '';
+      storeApp.displayItems(storeApp.currentStock, storeApp.currencies[currency]);
+
+      const currentFlag = document.querySelector('#flag');
+      currentFlag.src = storeApp.currencies[currency].flag;
+      currentFlag.alt = storeApp.currencies[currency].displayName
+
+      document.querySelector('#currency').textContent = storeApp.currencies[currency].displayName;
+    })
+  })
+  storeApp.displayItems(storeApp.currentStock, storeApp.currencies.usd);
+}
+
+storeApp.init();
