@@ -1,84 +1,113 @@
+const storeApp = {};
 
-// this is the store data. normally we would be grabbing data from elsewhere (an external api), but this will represent the data model! 
-  const totalInventory = [
-    {
-      title: 'Bowie Tee',
-      url: 'images/bowie.jpg',
-      price: 19.99,
-      stock: 4,
-    }, 
-    {
-      title: 'Don\'t Know Tee',
-      url: 'images/dontevenknow.jpg',
-      price: 22.50,
-      stock: 8,
-    }, 
-    {
-      title: 'Doughnut Jean Jacket',
-      url: 'images/doughnut.jpg',
-      price: 59.00,
-      stock: 5,
-    }, 
-    {
-      title: 'Journey Tee',
-      url: 'images/journey.jpg',
-      price: 22.99,
-      stock: 6,
-    }, 
-    {
-      title: 'Skeleton Jean Jacket',
-      url: 'images/someurl.jpg',
-      price: 30.00,
-      stock: 0,
-    }, 
-    {
-      title: 'Skeleton Hand Tee',
-      url: 'images/skeleton.jpg',
-      price: 30.00,
-      stock: 10,
-    }, 
-    {
-      title: 'HackerYou Hoodie',
-      price: 50.00,
-      stock: 4,
-    }, 
-  ]
+storeApp.totalInventory = [
+  {
+    title: 'Bowie Tee',
+    url: 'images/bowie.jpg',
+    price: 19.99,
+    stock: 4,
+  },
+  {
+    title: 'Don\'t Know Tee',
+    url: 'images/dontevenknow.jpg',
+    price: 22.50,
+    stock: 8,
+  },
+  {
+    title: 'Doughnut Jean Jacket',
+    url: 'images/doughnut.jpg',
+    price: 59.00,
+    stock: 5,
+  },
+  {
+    title: 'Journey Tee',
+    url: 'images/journey.jpg',
+    price: 22.99,
+    stock: 6,
+  },
+  {
+    title: 'Skeleton Jean Jacket',
+    url: 'images/someurl.jpg',
+    price: 30.00,
+    stock: 0,
+  },
+  {
+    title: 'Skeleton Hand Tee',
+    url: 'images/skeleton.jpg',
+    price: 30.00,
+    stock: 10,
+  },
+  {
+    title: 'HackerYou Hoodie',
+    price: 50.00,
+    stock: 4,
+  },
+]
 
-  // document ready function allows page to load before running any of our scripts 
-$(function(){
-
-  // this object allows us to organize some information that we want to display conditionally depending on what currency the user selects
-
-  const currencies = {
-    usd: {
-      exchange: 1,
-      symbol: `$`,
-      displayName: `USD`,
-      flag: `images/USD-flag.png`
-    },
-    cad: {
-      exchange: 1.28,
-      symbol: `$`,
-      displayName: `CAD`,
-      flag: `images/CAD-flag.png`
-    },
-    gbp: {
-      exchange: 0.76,
-      symbol: `£`,
-      displayName: `GBP`,
-      flag: `images/GBP-flag.png`
-    }
+storeApp.currencies = {
+  usd: {
+    exchange: 1,
+    symbol: `$`,
+    displayName: `USD`,
+    flag: `images/USD-flag.png`
+  },
+  cad: {
+    exchange: 1.28,
+    symbol: `$`,
+    displayName: `CAD`,
+    flag: `images/CAD-flag.png`
+  },
+  gbp: {
+    exchange: 0.76,
+    symbol: `£`,
+    displayName: `GBP`,
+    flag: `images/GBP-flag.png`
   }
+}
 
-  // STEP ONE: filter the inventory so that only items with images that are also in stock are displayed
-
-  // STEP TWO: write a function that displays inventory on the page in the correct pricing. HINT: What kind of information (paramaters) does this funciton need to properly display all of our information?  
-
-
-  // STEP THREE: display items on the page passing in USD as defualt
-
-
-  // STEP FOUR: add an event listener that will notice when a user clicks on a currency button, find out which currency they have selected, and call our display items method again. Don't forget to update the navigation, too! 
-
-
+storeApp.currentStock = storeApp.totalInventory.filter((item) => {
+  return item.url && item.stock;
 });
+
+storeApp.displayItems = (inventory, currency) => {
+  inventory.forEach((item) => {
+    let listItem = document.createElement('li');
+
+    let title = document.createElement('h2');
+    title.textContent = item.title;
+
+    let image = document.createElement('img');
+    image.src = item.url;
+
+    let price = document.createElement('p')
+    price.textContent = (item.price * currency.exchange).toFixed(2);
+
+    listItem.append(title, image, price);
+
+    document.querySelector('.inventory').append(listItem);
+  });
+}
+
+storeApp.registerButtonClickListeners = () => {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach((button) => {
+    button.addEventListener('click', function () {
+      const currency = this.id;
+      document.querySelector('.inventory').innerHTML = '';
+      storeApp.displayItems(storeApp.currentStock, storeApp.currencies[currency]);
+
+      const currentFlag = document.querySelector('#flag');
+      currentFlag.src = storeApp.currencies[currency].flag;
+      currentFlag.alt = storeApp.currencies[currency].displayName
+
+      document.querySelector('#currency').textContent = storeApp.currencies[currency].displayName;
+    })
+  })
+}
+
+storeApp.init = function () {
+  storeApp.registerButtonClickListeners(); 
+  storeApp.displayItems(storeApp.currentStock, storeApp.currencies.usd);
+}
+
+storeApp.init();
